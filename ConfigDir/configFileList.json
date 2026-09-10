@@ -1,0 +1,12 @@
+{
+    "InputSchedule": "hydrawise-watering-report_SCH.xlsx",
+    "InputUsage"   : "hydrawise-watering-report_USG.xlsx",
+    "Path"         : "C:/Users/edian/DownLoads/",
+    "NewSS"        :  "WaterUsage",
+    "OutputSchedule" : "WaterSch",
+    "OutputUsage"  : "WaterUsg",
+    "YearMonth"    : "2026-09",
+    "StartDay"     : "01",
+    "EndDay"       : "06",
+    "Test"         :"N"
+}

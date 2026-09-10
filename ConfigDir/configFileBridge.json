@@ -1,0 +1,10 @@
+{
+    "InputSchedule": "hydrawise-watering-report_SCH.xlsx",
+    "InputUsage": "hydrawise-watering-report_USG.xlsx",
+    "Path2"      :"C:\\Users\\edian\\OneDrive\\Documents\\HydrawiseData\\",     
+    "Path"     : "C:\\Users\\edian\\downloads\\",
+    "NewSS"     :  "WaterUsageBridge",
+    "OutputSchedule" : "WaterSch",
+    "OutputUsage" :    "WaterUsg",
+    "Test"      :   "N"
+}

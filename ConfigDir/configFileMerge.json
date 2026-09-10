@@ -1,0 +1,8 @@
+{
+    "BridgeSS"  : "WaterUsageBridge",
+    "OutSS"     : "WaterUsage",
+    "SchUsgSw"  : "S",
+    "CurPrvSw"  : "P",
+    "YearMonth" : "2026-06",
+    "Test"      :   "N"
+}
