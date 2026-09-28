@@ -5,7 +5,9 @@ import os
 import sys 
 ## open first sheet in workkbook
 
-def readExcelWorkbook(path):
+def readExcelWorkbook(HydraDict, inputSheet):
+
+    path = HydraDict['Path'][1] + inputSheet
 
     try:
         wb = opxl.load_workbook(filename=path ) 
@@ -25,10 +27,11 @@ def readExcelWorkbook(path):
     shrubsheet = []
     treeSheet = []
 
-    dateArr = utl.getDateParms()
-    month = dateArr[0]
-    startDay = dateArr[1]
-    endDay = dateArr[2]
+    ##dateArr = utl.getDateParms(HydraDict)
+    month  = (HydraDict["YearMonth"][1])[5:7]
+    ##month = yearMonth[5:7]
+    startDay = HydraDict["StartDay"][1]
+    endDay   =  HydraDict["EndDay"][1]
     
     for wssheet in wsList:
         openSheet = wb[wssheet]

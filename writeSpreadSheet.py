@@ -1,7 +1,6 @@
-import datetime
-import os.path
 import gspread
 import sys 
+import hydraUtilities as utl 
 
 #from google.auth.transport.requests import Request
 #from google.oauth2.credentials import Credentials
@@ -21,29 +20,20 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # The ID and range of a sample spreadsheet.
 
-def writeSpreadSheet(ssName,sheetName, entries, t_type):
+def writeSpreadSheet(ssOut, sheetName, entries,t_type):
 
-   gc = gspread.oauth()
-   ss = gc.open(ssName)
-   sheet = ss.worksheet(sheetName)
+   sheet = ssOut.worksheet(sheetName)
 
-    
-  ## assume header one row and is first row 
-  ## by trans type 
-   if sheetName == 'WaterSch':
-      if t_type == 'Rose':
-         namedRange = 'WaterSchRoseData'
-      elif t_type == 'Schrub':
-       namedRange = 'WaterSchSchrubData'
-      elif t_type == 'Tree':
-       namedRange = 'WaterSchTreeData'
-   else:    ## assume usage 
-      if t_type == 'Rose':
-         namedRange = 'WaterUsgRoseData'
-      elif t_type == 'Schrub':
-         namedRange = 'WaterUsgSchrubData'
-      elif t_type == 'Tree':
-         namedRange = 'WaterUsgTreeData'
+   ## calculate range
+   start =  utl.detLastRow(sheet,t_type) +1
+   end = start + len(entries)-1
+   
+   if t_type == 'Rose':
+      namedRange = 'A' + str(start) + ':E' + str(end) 
+   elif t_type == 'Schrub':
+      namedRange = 'G' + str(start) + ':K' + str(end) 
+   elif t_type == 'Tree':
+      namedRange = 'M' + str(start) + ':Q' + str(end)   
 
-   ss.values_clear(namedRange)
+   ssOut.values_clear(namedRange)
    sheet.update(namedRange,entries)  

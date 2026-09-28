@@ -8,118 +8,77 @@ Steps
 4 - write the output sheet
 '''
 
-import openpyxl as opxl 
 import sys 
-from datetime import datetime 
 import readExcelWorkbook as readxls
 import readConfigFile as cfg  
 from writeSpreadSheet import writeSpreadSheet
 import  DateUtils as dtUtils 
 
 ## get sheet attributes to determine type and sheets 
-global configList 
 
-def ReadAndWriteReport(inputSheet, spreadsheetName):
+
+def ReadAndWriteReport(ssOut, inputSheet, spreadsheetName,HydraDict):
     ## 1 - read config report 
-    global configList
-    configList = cfg.readConfigFile("List")
-    Path = configList["Path"]
-       
-        ## 2 - read Excel input file 
-    inputSheet  = Path + inputSheet
-    results   = readxls.readExcelWorkbook(inputSheet)
+    
+    ##configList = cfg.readConfigFile("List")
+    Path = HydraDict['Path'][1]
+     ## 2 - read Excel input file 
+    results   = readxls.readExcelWorkbook(HydraDict, inputSheet)
     roseList = results[0]
     schrubList = results[1]
     treeList = results[2]
-
-
     
     ## get the type 
     sheetType = readxls.getSheetType(inputSheet)  
     
     ## 3 - verify the type 
     if sheetType == 'SCH':
-        sheetName = configList["OutputSchedule"]
+        sheetName = HydraDict['OutputSchedule'][1]
     elif sheetType == 'USG' :
-        sheetName = configList["OutputUsage"]
+        sheetName = HydraDict['OutputUsage'][1]
     else: 
         sheetName = ' '
     ## 4 - write the output sheet 
     if sheetName > ' ' : 
-        writeSpreadSheet(spreadsheetName,sheetName,roseList, 'Rose')
-        writeSpreadSheet(spreadsheetName,sheetName,schrubList, 'Schrub')
-        writeSpreadSheet(spreadsheetName,sheetName,treeList, 'Tree')
+        writeSpreadSheet(ssOut, sheetName,roseList, 'Rose')
+        writeSpreadSheet(ssOut, sheetName,schrubList, 'Schrub')
+        writeSpreadSheet(ssOut, sheetName,treeList, 'Tree')
 
-def ReadAndWriteBridge(inputSheet):
-    ## 1 - read config report 
-    configList = cfg.readConfigFile("Bridge")
-    NewSS = configList["NewSS"]
-    Test  = configList["Test"]
-    if Test == 'Y' : 
-       NewSS = NewSS + '_tst'
-    
-    Path = configList["Path"]
-          
-        ## 2 - read Excel input file 
-    inputSheet  = Path + inputSheet
-    results = '' 
-    results   = readxls.readExcelWorkbook(inputSheet)
-    lista = results[0]
-    sheetType  = results[1]
-    hdrRow =     results[2]
-    
-    ##resultsC =  bulldCurrent(lista,YearMonth) 
-    ##resultsP =  bulldPrevious(lista,YearMonth)
-    
-    ## 3 - verify the type 
-    if sheetType == 'SCH':
-        sheetNameC = "WaterSchC"
-        sheetNameP = "WaterSchP"
-    elif sheetType == 'USG' :
-        sheetNameC = "WaterUsgC"
-        sheetNameP = "WaterUsgP"
-    else: 
-        sheetName = ' '
-    
-    ## 4 - write the output sheet 
-    if str(sheetType) == 'SCH' : 
-     writeSpreadSheet(NewSS,'WaterSch',lista,"",hdrRow)
-    if str(sheetType) == 'USG': 
-     writeSpreadSheet(NewSS,'WaterUsg',lista,"",hdrRow)
-
-
-
-def MergeAndSort(lista,listb,yearMonth):    
-   mergedAndSorted = sorted(lista + listb, key=lambda x: (x[0], x[1], x[2]))
-   ##filter out unwatned month 
-   month = int(yearMonth[6:])
-   outArray = []
-   for row in mergedAndSorted:
-    monthArry = int(row[1].month) 
-    if monthArry == month:
-        outArray.append(row)
-   
-   return outArray
-
-def detSchUsgSheet(SchUsgSw):
-    if SchUsgSw == 'S':
-      return  'WaterSch'
-    else:
-      return 'WaterUsg'
-    
 def cvtCols(sheetValues):
    for row in sheetValues:
       row[1] = dtUtils.cvtToDate(row[1])
       row[2] = dtUtils.cvtToTime(row[2])
-   
    return sheetValues
-
+    
 def cvtColsBack(sheetValues):
    for row in sheetValues:
       row[1] = dtUtils.cvtFrmDate(row[1])
       row[2] = dtUtils.cvtFrmTime(row[2])
    
    return sheetValues
+
+def detLastRow(ss,t_type):
+    if t_type == 'Rose':
+          namedRange = 'A1:A100'
+    elif t_type == 'Schrub':
+          namedRange = 'G1:G100'  
+    elif t_type == 'Tree':
+          namedRange = 'M1:100'    
+
+    sheetValues = ss.get(namedRange)
+
+    lastRow = 0 
+    for row in sheetValues:
+        if row[0] <= ' ':
+          break
+        lastRow += 1 
+    return lastRow
+ 
+def detSchUsgSheet(SchUsgSw):
+    if SchUsgSw == 'S':
+      return  'WaterSch'
+    else:
+      return 'WaterUsg'
 
 def removeDuplicates(sheetValuesIn):
     seenKeys = set() 
@@ -133,12 +92,3 @@ def removeDuplicates(sheetValuesIn):
             seenKeys.add(key)
             uniqueData.append(row)
     return uniqueData 
-
-def getDateParms():
-   global configList
-   yearMonth = configList["YearMonth"]
-   startDay =  configList["StartDay"]
-   endDay   =  configList["EndDay"]
-
-   month = yearMonth[5:7]
-   return [month, startDay,endDay]

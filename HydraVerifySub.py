@@ -13,8 +13,8 @@ from gspread.exceptions  import SpreadsheetNotFound
 from gspread.exceptions  import WorksheetNotFound 
 import verifyExcelWorkbook as excl
 import readConfigFile as cfg
-
-
+from Utilities import getAsList
+from Utilities import insert_before_key
 
 ## 1- verify configuration 
 
@@ -24,80 +24,66 @@ def HydraVerifySub(type):
   InputSchedule      =  config["InputSchedule"]
   InputUsage         =  config["InputUsage"]
   Path               =  config["Path"]
-  NewSS            =    config["NewSS"]
+  OutSS              =    config["OutSS"]
   OutputSchedule     =  config["OutputSchedule"]
   OutputUsage        =  config["OutputUsage"]
   YearMonth          =  config["YearMonth"]
+  StartDay           =  config['StartDay']
+  EndDay             =  config['EndDay']
   Test               =  config["Test"]
-  global spreadsheetName
 
-  HydraVerifyArr = []
-  HydraVerifyArr.append(["OS Files ", "--------------"])
-  HydraVerifyArr.append(["Path  ", Path])
-  HydraVerifyArr.append(["Input Schedule", InputSchedule])
-  HydraVerifyArr.append(["Input Usage", InputUsage])
-  HydraVerifyArr.append(["Spreadsheet Info ", "--------------"])
-  HydraVerifyArr.append(["New SS", NewSS])
-  HydraVerifyArr.append(["Year Month", YearMonth])
-  HydraVerifyArr.append(["Revised FileName","------------"])
-  spreadsheetName = NewSS + '_' + YearMonth
-  if Test == 'Y':
-    spreadsheetName = spreadsheetName + "_tst"
    
-  HydraVerifyArr.append(["New SS", spreadsheetName])
-  HydraVerifyArr.append(["SheetName Sch", OutputSchedule])
-  HydraVerifyArr.append(["SheetName Usg", OutputUsage])
-  HydraVerifyArr.append(["Test", Test])
+  spreadsheetName  = OutSS + '_' + YearMonth 
+  if Test =='Y':
+    spreadsheetName += '_tst'
 
-
-  ##verify input files (spreadsheets) 
+  HydraDict =  dict(
+            Path = ["Folder Path", Path], 
+            InputSchedule = ['Input Sch SS', InputSchedule],
+            InputUsage = ['Input Usg SS ', InputUsage],
+            OutSS = ['Out SS', OutSS],
+            YearMonth = ['Year Month', YearMonth],
+            Test = ['Test', Test],
+            StartDay = ['Start Day', StartDay],
+            EndDay = ['End Day', EndDay], 
+            spreadsheetName = ['spreadsheet Name', spreadsheetName],
+            OutputSchedule = ['Output Sch sheet', OutputSchedule],
+            OutputUsage = ['Output Usg sheet', OutputUsage]
+  ) 
+    
+    ##verify input files (spreadsheets) 
   InputSchedule = Path + InputSchedule 
-  Msg = excl.verfiyExcelWorkbook(InputSchedule)
-  HydraVerifyArr[2].append(Msg)
+  msg = excl.verfiyExcelWorkbook(InputSchedule)
+  HydraDict['InputSchedule'].append(msg)
 
   InputUsage = Path + InputUsage 
-  Msg = excl.verfiyExcelWorkbook(InputUsage)
-  HydraVerifyArr[3].append(Msg)
+  msg = excl.verfiyExcelWorkbook(InputUsage)
+  HydraDict['InputUsage'].append(msg)
 
   try:
     gc = gspread.oauth()
-    ss = gc.open(spreadsheetName)
-    Msg = 'found'
+    ssOut = gc.open(spreadsheetName)
+    msg = 'found'
   except SpreadsheetNotFound:
-    Msg = 'Not found'
-  HydraVerifyArr[8].append(Msg)
+    msg = 'Not found'
+  HydraDict['spreadsheetName'].append(msg)
 
 
   ## verify output sheets 
-  if Msg == 'found':
+  if msg == 'found':
     try:
-      ssInWorksheet = ss.worksheet(OutputSchedule)
-      Msg = 'found'
+      ssInWorksheet = ssOut.worksheet(OutputSchedule)
+      msg = 'found'
     except WorksheetNotFound:
-      Msg = 'Not found'
-    HydraVerifyArr[9].append(Msg)
+      msg = 'Not found'
+    HydraDict['OutputSchedule'].append(msg)
 
     try:
-      ssInWorksheet = ss.worksheet(OutputUsage)
+      ssInWorksheet = ssOut.worksheet(OutputUsage)
       Msg= 'found'
     except WorksheetNotFound:
       Msg='Not foound'
-    
-    HydraVerifyArr[10].append(Msg)
-    try:
-        ssInWorksheet = ss.worksheet(OutputSchedule)
-        Msg = 'found'
-    except WorksheetNotFound:
-        Msg = 'Not found'
-    HydraVerifyArr[9].append(Msg)
 
-    try:
-      ssInWorksheet = ss.worksheet(OutputUsage)
-      Msg= 'found'
-    except WorksheetNotFound:
-      Msg='Not foound'
-      
-    HydraVerifyArr[10].append(Msg)
-
-  return HydraVerifyArr 
+  return ssOut, HydraDict 
+  
 
