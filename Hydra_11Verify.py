@@ -10,8 +10,8 @@ import sys
 import verifyExcelWorkbook as excl
 from displayComp import displayComp
 from HydraVerifySub import HydraVerifySub
-from Utilities import getAsList
-from Utilities import insert_before_key
+from GenUtilities import getAsList
+from GenUtilities import insert_before_key
 
 from tkinter import *
 

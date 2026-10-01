@@ -13,8 +13,6 @@ from gspread.exceptions  import SpreadsheetNotFound
 from gspread.exceptions  import WorksheetNotFound 
 import verifyExcelWorkbook as excl
 import readConfigFile as cfg
-from Utilities import getAsList
-from Utilities import insert_before_key
 
 ## 1- verify configuration 
 
@@ -83,6 +81,8 @@ def HydraVerifySub(type):
       Msg= 'found'
     except WorksheetNotFound:
       Msg='Not foound'
+    HydraDict['OutputUsage'].append(msg)
+  
 
   return ssOut, HydraDict 
   

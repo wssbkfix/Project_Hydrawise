@@ -5,8 +5,8 @@
     "OutSS"        : "WaterUsage",
     "OutputSchedule" : "WaterSch",
     "OutputUsage"  : "WaterUsg",
-    "YearMonth"    : "2026-08",
-    "StartDay"     : "11",
-    "EndDay"       : "20",
+    "YearMonth"    : "2026-09",
+    "StartDay"     : "01",
+    "EndDay"       : "30",
     "Test"         :"Y"
 }
