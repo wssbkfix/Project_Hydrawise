@@ -36,23 +36,28 @@ def readExcelWorkbook(HydraDict, inputSheet):
     for wssheet in wsList:
         openSheet = wb[wssheet]
         wb.iso_dates = True
-        for row in openSheet.iter_rows(values_only=False, min_row=1,min_col=1, max_col=4):
+        for row in openSheet.iter_rows(values_only=True, min_row=1,min_col=1, max_col=4):
             i=0
             rowLine = []
             rowLine.append(wssheet)
             for cell in row:
-                result = isinstance(cell.value,datetime)
-                if isinstance(cell.value,datetime):
+                result = isinstance(cell,datetime)
+                if isinstance(cell,datetime):
                     if i == 0:
-                        rowLine.append(cell.value.strftime('%Y-%m-%d'))
+                        rowLine.append(cell.strftime('%Y-%m-%d'))
                         i += 1
                     else: 
-                        rowLine.append(cell.value.strftime('%H:%M:%S'))
+                        rowLine.append(cell.strftime('%H:%M:%S'))
                 else:
-                    rowLine.append(cell.value)
+                    rowLine.append(cell)
 
-            lineMonth = rowLine[1][5:7]
-            lineDay =   rowLine[1][8:10] 
+            if (rowLine[1] != 'Date' and
+                rowLine[1] is not None):   ## header 
+                lineMonth = rowLine[1][5:7]
+                lineDay =   rowLine[1][8:10]
+            else:
+                lineMonth = '99'
+                lineDay = '99' 
 
             if lineMonth == month:
                 if lineDay >= startDay and lineDay <= endDay:

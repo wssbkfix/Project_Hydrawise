@@ -22,3 +22,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# ignore all entries in the cnfigDir directory 
+ConfigDir/*.*
